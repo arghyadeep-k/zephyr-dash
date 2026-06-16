@@ -4,6 +4,7 @@ import io
 import pandas as pd
 import numpy as np
 from difflib import SequenceMatcher
+import streamlit as st
 
 COLUMN_ALIASES: dict[str, list[str]] = {
     "date":            ["date", "day", "timestamp", "time", "datetime", "record date", "log date"],
@@ -149,6 +150,7 @@ def load_file(file_obj) -> tuple[pd.DataFrame, str, dict[str, str]]:
     return df, dtype, col_map
 
 
+@st.cache_data
 def add_hrv_anomalies(df: pd.DataFrame, window: int = 7, drop_pct: float = 0.20) -> pd.DataFrame:
     """Add hrv_7d_avg, hrv_drop_pct, and hrv_anomaly columns to a sleep DataFrame."""
     if "hrv" not in df.columns:
@@ -160,6 +162,7 @@ def add_hrv_anomalies(df: pd.DataFrame, window: int = 7, drop_pct: float = 0.20)
     return df
 
 
+@st.cache_data
 def get_weekly_summary(data: dict[str, pd.DataFrame]) -> pd.DataFrame:
     """Compare this calendar week (Mon–today) vs the full prior week."""
     today = pd.Timestamp.now().normalize()
@@ -198,6 +201,7 @@ def get_weekly_summary(data: dict[str, pd.DataFrame]) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+@st.cache_data
 def get_hrv_readiness_corr(sleep_df: pd.DataFrame, readiness_df: pd.DataFrame) -> pd.DataFrame:
     """Join overnight HRV with the *next morning's* readiness score."""
     if "hrv" not in sleep_df.columns or "readiness_score" not in readiness_df.columns:
