@@ -30,9 +30,16 @@ Column names are matched fuzzily, so minor header changes between Zepp app versi
 ```bash
 git clone <repo>
 cd health-dash
+
+# Create and activate a virtual environment
+python3 -m venv .venv
+source .venv/bin/activate      # Windows: .venv\Scripts\activate
+
 pip install -r requirements.txt
 streamlit run app.py
 ```
+
+Deactivate the virtual environment when you're done with `deactivate`.
 
 Requires Python 3.10+.
 
