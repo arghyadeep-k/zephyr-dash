@@ -18,7 +18,7 @@ COLUMN_ALIASES: dict[str, list[str]] = {
     "resting_hr":      ["resting hr", "resting heart rate", "resting_hr", "rhr", "resting bpm", "min hr"],
     "breathing_rate":  ["breathing rate", "breath rate", "respiratory rate", "breathing rate(rpm)", "respiration rate"],
     "steps":           ["steps", "step count", "total steps", "daily steps", "step_count"],
-    "calories":        ["calories", "calorie", "kcal", "total calories", "calories(kcal)", "cal"],
+    "calories":        ["calories", "calorie", "kcal", "total calories", "calories(kcal)"],
     "active_minutes":  ["active minutes", "active time", "exercise minutes", "active_minutes", "active time(min)"],
     "distance":        ["distance", "distance(km)", "distance(m)", "total distance"],
     "heart_rate":      ["heart rate", "avg heart rate", "average heart rate", "bpm", "avg bpm"],

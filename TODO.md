@@ -202,10 +202,10 @@ fig.update_yaxes(gridcolor=T["grid"], linecolor=T["grid"])
 | 6 | Move correlation matrix to `data_utils` | Medium | ✅ Done |
 | 7 | Per-dataset removal in sidebar | Medium | ✅ Done |
 | 8 | Configurable HRV anomaly threshold | Medium | ✅ Done |
-| 9 | Date range From > To validation | Low | ⬜ Open |
-| 10 | Redundant `== True` comparison | Low | ⬜ Open |
-| 11 | Hardcoded step/activity goals | Low | ⬜ Open |
-| 12 | `"cal"` alias too broad | Low | ⬜ Open |
-| 13 | `total_sleep` unused | Low | ⬜ Open |
+| 9 | Date range From > To validation | Low | ✅ Done |
+| 10 | Redundant `== True` comparison | Low | ✅ Done |
+| 11 | Hardcoded step/activity goals | Low | ✅ Done |
+| 12 | `"cal"` alias too broad | Low | ✅ Done |
+| 13 | `total_sleep` unused | Low | ✅ Done |
 | 14 | `CHART_LAYOUT` axis key conflict | Low | ⬜ Open |
 | 15 | Unit tests for `data_utils.py` | Low | ⬜ Open |

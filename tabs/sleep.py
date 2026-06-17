@@ -44,6 +44,21 @@ def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict, AVG_LINE: str,
         )
         st.plotly_chart(fig, use_container_width=True)
 
+    # ── Total sleep summary stats ─────────────────────────────────────────
+    if "total_sleep" in sleep.columns:
+        ts = sleep["total_sleep"].dropna()
+        if not ts.empty:
+            st.markdown("#### Total Sleep Duration")
+            c1, c2, c3, c4 = st.columns(4)
+            with c1:
+                st.metric("Average", f"{ts.mean() / 60:.1f} h")
+            with c2:
+                st.metric("Median", f"{ts.median() / 60:.1f} h")
+            with c3:
+                st.metric("Best night", f"{ts.max() / 60:.1f} h")
+            with c4:
+                st.metric("Shortest night", f"{ts.min() / 60:.1f} h")
+
     # ── Sleep score + HRV ─────────────────────────────────────────────────
     col1, col2 = st.columns(2)
 
