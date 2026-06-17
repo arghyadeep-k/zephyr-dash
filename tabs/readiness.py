@@ -3,6 +3,7 @@ import streamlit as st
 import plotly.graph_objects as go
 
 from data_utils import rolling_line
+from tabs.helpers import apply_axis_style
 
 
 def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict, AVG_LINE: str) -> None:
@@ -43,6 +44,7 @@ def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict, AVG_LINE: str) -> N
         yaxis_title="Readiness Score", yaxis_range=[0, 105],
         legend=dict(orientation="h"),
     )
+    apply_axis_style(fig, T)
     st.plotly_chart(fig, use_container_width=True)
 
     col1, col2, col3 = st.columns(3)

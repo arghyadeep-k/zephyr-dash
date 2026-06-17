@@ -5,6 +5,7 @@ import plotly.express as px
 import pandas as pd
 
 from data_utils import add_hrv_anomalies, rolling_line
+from tabs.helpers import apply_axis_style
 
 
 def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict, AVG_LINE: str,
@@ -42,6 +43,7 @@ def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict, AVG_LINE: str,
             **CHART_LAYOUT, height=320, yaxis_title="Duration (min)",
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         )
+        apply_axis_style(fig, T)
         st.plotly_chart(fig, use_container_width=True)
 
     # ── Total sleep summary stats ─────────────────────────────────────────
@@ -79,6 +81,7 @@ def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict, AVG_LINE: str,
             ))
             fig.update_layout(**CHART_LAYOUT, height=280, yaxis_range=[0, 105],
                                legend=dict(orientation="h", yanchor="bottom", y=1.02))
+            apply_axis_style(fig, T)
             st.plotly_chart(fig, use_container_width=True)
 
     with col2:
@@ -108,6 +111,7 @@ def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict, AVG_LINE: str,
                 ))
             fig.update_layout(**CHART_LAYOUT, height=280, yaxis_title="HRV",
                                legend=dict(orientation="h", yanchor="bottom", y=1.02))
+            apply_axis_style(fig, T)
             st.plotly_chart(fig, use_container_width=True)
 
             if not anomalies.empty:
@@ -133,6 +137,7 @@ def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict, AVG_LINE: str,
                           color_discrete_sequence=[C["resting_hr"]])
             fig.update_traces(line_width=2, mode="lines+markers", marker_size=4)
             fig.update_layout(**CHART_LAYOUT, height=260, yaxis_title="bpm")
+            apply_axis_style(fig, T)
             st.plotly_chart(fig, use_container_width=True)
 
     with col4:
@@ -143,4 +148,5 @@ def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict, AVG_LINE: str,
                           color_discrete_sequence=[C["breathing_rate"]])
             fig.update_traces(line_width=2, mode="lines+markers", marker_size=4)
             fig.update_layout(**CHART_LAYOUT, height=260, yaxis_title="rpm")
+            apply_axis_style(fig, T)
             st.plotly_chart(fig, use_container_width=True)

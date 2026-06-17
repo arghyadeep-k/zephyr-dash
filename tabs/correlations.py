@@ -3,6 +3,7 @@ import streamlit as st
 import plotly.express as px
 
 from data_utils import get_hrv_readiness_corr, get_correlation_matrix
+from tabs.helpers import apply_axis_style
 
 
 def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict) -> None:
@@ -33,6 +34,7 @@ def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict) -> None:
                     color_discrete_sequence=[C["hrv"]],
                 )
             fig.update_layout(**CHART_LAYOUT, height=380)
+            apply_axis_style(fig, T)
             st.plotly_chart(fig, use_container_width=True)
 
             strength  = "strong" if abs(r) > 0.6 else "moderate" if abs(r) > 0.3 else "weak"
@@ -62,4 +64,5 @@ def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict) -> None:
         aspect="auto",
     )
     fig.update_layout(**CHART_LAYOUT, height=520)
+    apply_axis_style(fig, T)
     st.plotly_chart(fig, use_container_width=True)

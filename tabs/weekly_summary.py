@@ -3,6 +3,7 @@ import streamlit as st
 import plotly.graph_objects as go
 
 from data_utils import get_weekly_summary
+from tabs.helpers import apply_axis_style
 
 _HIGHER_BETTER = {
     "Sleep Score", "HRV", "Deep Sleep (min)", "REM Sleep (min)",
@@ -74,4 +75,5 @@ def render(full_data: dict, C: dict, T: dict, CHART_LAYOUT: dict) -> None:
         legend=dict(orientation="h", yanchor="bottom", y=1.02),
         margin=dict(t=20, b=90, l=4, r=4),
     )
+    apply_axis_style(fig, T)
     st.plotly_chart(fig, use_container_width=True)

@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 import pandas as pd
 
 from data_utils import FRIENDLY_NAMES
+from tabs.helpers import apply_axis_style
 
 
 def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict) -> None:
@@ -35,6 +36,7 @@ def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict) -> None:
         ))
     fig.update_layout(**CHART_LAYOUT, height=400, yaxis_title="bpm",
                        legend=dict(orientation="h"))
+    apply_axis_style(fig, T)
     st.plotly_chart(fig, use_container_width=True)
 
     col1, col2, _ = st.columns(3)

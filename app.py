@@ -155,8 +155,6 @@ CHART_LAYOUT = dict(
     font_color    = T["font_color"],
     hovermode     = "x unified",
     margin        = dict(t=16, b=4, l=4, r=4),
-    xaxis         = dict(gridcolor=T["grid"], linecolor=T["grid"]),
-    yaxis         = dict(gridcolor=T["grid"], linecolor=T["grid"]),
 )
 
 # ── Color palette ──────────────────────────────────────────────────────────

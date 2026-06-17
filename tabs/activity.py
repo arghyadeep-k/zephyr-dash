@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 
 from data_utils import rolling_line
+from tabs.helpers import apply_axis_style
 
 STEP_GOAL           = 10_000
 ACTIVE_MINUTES_GOAL = 30
@@ -37,6 +38,7 @@ def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict, AVG_LINE: str) -> N
                       annotation_font_color=T["subtext"])
         fig.update_layout(**CHART_LAYOUT, height=300, yaxis_title="Steps",
                            legend=dict(orientation="h", yanchor="bottom", y=1.02))
+        apply_axis_style(fig, T)
         st.plotly_chart(fig, use_container_width=True)
 
     col1, col2 = st.columns(2)
@@ -47,6 +49,7 @@ def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict, AVG_LINE: str) -> N
             fig = px.area(ca, x="date", y="calories",
                           color_discrete_sequence=[C["calories"]])
             fig.update_layout(**CHART_LAYOUT, height=270, yaxis_title="kcal")
+            apply_axis_style(fig, T)
             st.plotly_chart(fig, use_container_width=True)
 
     with col2:
@@ -60,6 +63,7 @@ def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict, AVG_LINE: str) -> N
                           annotation_position="bottom right",
                           annotation_font_color=T["subtext"])
             fig.update_layout(**CHART_LAYOUT, height=270, yaxis_title="minutes")
+            apply_axis_style(fig, T)
             st.plotly_chart(fig, use_container_width=True)
 
     if "distance" in act.columns:
@@ -69,4 +73,5 @@ def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict, AVG_LINE: str) -> N
                       color_discrete_sequence=[C["distance"]])
         fig.update_traces(line_width=2, fill="tozeroy", fillcolor="rgba(120,144,156,0.2)")
         fig.update_layout(**CHART_LAYOUT, height=240, yaxis_title="km")
+        apply_axis_style(fig, T)
         st.plotly_chart(fig, use_container_width=True)

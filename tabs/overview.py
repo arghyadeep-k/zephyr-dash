@@ -1,6 +1,7 @@
 """Overview tab — latest snapshot KPIs and sparklines."""
 import streamlit as st
 import plotly.express as px
+from tabs.helpers import apply_axis_style
 
 
 def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict) -> None:
@@ -65,5 +66,6 @@ def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict) -> None:
                 )
                 fig.update_layout(coloraxis_showscale=False)
             fig.update_layout(**CHART_LAYOUT, height=220, showlegend=False)
+            apply_axis_style(fig, T)
             st.plotly_chart(fig, use_container_width=True)
         col_idx += 1

@@ -1,6 +1,7 @@
 """Stress tab — daily stress band and summary stats."""
 import streamlit as st
 import plotly.graph_objects as go
+from tabs.helpers import apply_axis_style
 
 
 def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict) -> None:
@@ -43,6 +44,7 @@ def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict) -> None:
         yaxis_title="Stress Level", yaxis_range=[0, 100],
         legend=dict(orientation="h"),
     )
+    apply_axis_style(fig, T)
     st.plotly_chart(fig, use_container_width=True)
 
     col1, col2, col3 = st.columns(3)
