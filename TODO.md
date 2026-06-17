@@ -197,11 +197,11 @@ fig.update_yaxes(gridcolor=T["grid"], linecolor=T["grid"])
 | 1 | `st.stop()` bug in sleep tab | High | ✅ Done |
 | 2 | Cache pure computations | High | ✅ Done |
 | 3 | Add `.gitignore` | High | ✅ Done |
-| 4 | Weekly slice misses current week | Medium | ⬜ Open |
-| 5 | Split `app.py` into tab modules | Medium | ⬜ Open |
-| 6 | Move correlation matrix to `data_utils` | Medium | ⬜ Open |
-| 7 | Per-dataset removal in sidebar | Medium | ⬜ Open |
-| 8 | Configurable HRV anomaly threshold | Medium | ⬜ Open |
+| 4 | Weekly slice misses current week | Medium | ✅ Done |
+| 5 | Split `app.py` into tab modules | Medium | ✅ Done |
+| 6 | Move correlation matrix to `data_utils` | Medium | ✅ Done |
+| 7 | Per-dataset removal in sidebar | Medium | ✅ Done |
+| 8 | Configurable HRV anomaly threshold | Medium | ✅ Done |
 | 9 | Date range From > To validation | Low | ⬜ Open |
 | 10 | Redundant `== True` comparison | Low | ⬜ Open |
 | 11 | Hardcoded step/activity goals | Low | ⬜ Open |

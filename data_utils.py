@@ -151,6 +151,12 @@ def load_file(file_obj) -> tuple[pd.DataFrame, str, dict[str, str]]:
 
 
 @st.cache_data
+def rolling_line(series: pd.Series, window: int = 7) -> pd.Series:
+    """Rolling mean with a minimum of 3 observations."""
+    return series.rolling(window, min_periods=3).mean()
+
+
+@st.cache_data
 def add_hrv_anomalies(df: pd.DataFrame, window: int = 7, drop_pct: float = 0.20) -> pd.DataFrame:
     """Add hrv_7d_avg, hrv_drop_pct, and hrv_anomaly columns to a sleep DataFrame."""
     if "hrv" not in df.columns:
@@ -183,7 +189,7 @@ def get_weekly_summary(data: dict[str, pd.DataFrame]) -> pd.DataFrame:
         df = data[dtype]
         if "date" not in df.columns:
             continue
-        this_week = df[df["date"].between(this_start, this_start + pd.Timedelta(days=6))]
+        this_week = df[df["date"].between(this_start, today)]
         last_week = df[df["date"].between(last_start, last_start + pd.Timedelta(days=6))]
         for col in cols:
             if col not in df.columns:
@@ -211,6 +217,24 @@ def get_hrv_readiness_corr(sleep_df: pd.DataFrame, readiness_df: pd.DataFrame) -
     # shift readiness date back 1 day so it aligns with the preceding night's HRV
     read["date"] = read["date"] - pd.Timedelta(days=1)
     return pd.merge(hrv, read, on="date", how="inner")
+
+
+@st.cache_data
+def get_correlation_matrix(data: dict[str, pd.DataFrame]) -> pd.DataFrame:
+    """Pearson correlation matrix across all numeric metrics from all data types."""
+    series_map: dict[str, pd.Series] = {}
+    for df in data.values():
+        if df.empty or "date" not in df.columns:
+            continue
+        for col in df.columns:
+            if col == "date":
+                continue
+            if df[col].dtype in (float, int, np.float64, np.int64, np.float32, np.int32):
+                label = FRIENDLY_NAMES.get(col, col)
+                series_map[label] = df.set_index("date")[col]
+    if len(series_map) < 3:
+        return pd.DataFrame()
+    return pd.DataFrame(series_map).corr()
 
 
 def make_sample_data() -> dict[str, pd.DataFrame]:
