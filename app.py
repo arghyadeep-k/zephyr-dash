@@ -2,6 +2,8 @@
 import streamlit as st
 import pandas as pd
 
+from theme import THEMES, C, _inject_css
+
 import tabs.overview
 import tabs.sleep
 import tabs.activity
@@ -11,7 +13,7 @@ import tabs.readiness
 import tabs.correlations
 import tabs.weekly_summary
 
-from data_utils import load_file, make_sample_data
+from data_utils import load_file, make_sample_data, filter_by_date, global_date_bounds
 
 # ── Page config ────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -21,40 +23,6 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ── Theme config ───────────────────────────────────────────────────────────
-THEMES: dict[str, dict] = {
-    "dark": {
-        "bg":          "#0E1117",
-        "sidebar_bg":  "#1e2130",
-        "card_bg":     "#1e2130",
-        "card_border": "none",
-        "text":        "#e0e0e0",
-        "subtext":     "#a0a0a0",
-        "divider":     "#333",
-        "primary":     "#4ECDC4",
-        "font_color":  "#e0e0e0",
-        "grid":        "rgba(255,255,255,0.08)",
-        "avg_line":    "#ffffff",
-        "plot_bg":     "rgba(0,0,0,0)",
-        "paper_bg":    "rgba(0,0,0,0)",
-    },
-    "light": {
-        "bg":          "#f8f9fa",
-        "sidebar_bg":  "#eef0f5",
-        "card_bg":     "#eef0f5",
-        "card_border": "1px solid #dde1ec",
-        "text":        "#1a1a1a",
-        "subtext":     "#555555",
-        "divider":     "#cccccc",
-        "primary":     "#0d8a82",
-        "font_color":  "#1a1a1a",
-        "grid":        "rgba(0,0,0,0.08)",
-        "avg_line":    "#333333",
-        "plot_bg":     "rgba(0,0,0,0)",
-        "paper_bg":    "rgba(0,0,0,0)",
-    },
-}
-
 # ── Session state ──────────────────────────────────────────────────────────
 if "theme" not in st.session_state:
     st.session_state.theme = "dark"
@@ -62,88 +30,6 @@ if "data" not in st.session_state:
     st.session_state.data: dict[str, pd.DataFrame] = {}
 
 T = THEMES[st.session_state.theme]
-
-
-# ── CSS injection ──────────────────────────────────────────────────────────
-def _inject_css(theme: str) -> None:
-    t = THEMES[theme]
-    if theme == "dark":
-        st.markdown(f"""
-        <style>
-        div[data-testid="metric-container"] {{
-            background: {t["card_bg"]};
-            border-radius: 10px;
-            padding: 12px 16px;
-        }}
-        </style>
-        """, unsafe_allow_html=True)
-        return
-
-    st.markdown(f"""
-    <style>
-    .stApp,
-    [data-testid="stAppViewContainer"],
-    [data-testid="stMain"],
-    section[data-testid="stMain"],
-    .main .block-container {{
-        background-color: {t["bg"]} !important;
-    }}
-    [data-testid="stSidebar"],
-    [data-testid="stSidebar"] > div:first-child {{
-        background-color: {t["sidebar_bg"]} !important;
-    }}
-    .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp h4,
-    .stApp span:not([data-testid]),
-    .stApp label, .stApp li, .stMarkdown,
-    [data-testid="stText"], [data-testid="stHeadingWithActionElements"] {{
-        color: {t["text"]} !important;
-    }}
-    [data-testid="stCaptionContainer"],
-    .stCaption {{ color: {t["subtext"]} !important; }}
-    div[data-testid="metric-container"] {{
-        background: {t["card_bg"]} !important;
-        border: {t["card_border"]} !important;
-        border-radius: 10px;
-        padding: 12px 16px;
-    }}
-    [data-testid="stMetricValue"],
-    [data-testid="stMetricLabel"] {{ color: {t["text"]} !important; }}
-    button[data-baseweb="tab"] {{ color: {t["subtext"]} !important; }}
-    button[data-baseweb="tab"][aria-selected="true"] {{ color: {t["primary"]} !important; }}
-    [data-testid="stTabs"] [data-baseweb="tab-border"] {{
-        background-color: {t["primary"]} !important;
-    }}
-    [data-testid="stAlert"] {{
-        background-color: #ddeeff !important;
-        color: #1a1a1a !important;
-    }}
-    [data-testid="stAlert"] p {{ color: #1a1a1a !important; }}
-    [data-testid="stExpander"] summary {{ color: {t["text"]} !important; }}
-    hr {{ border-color: {t["divider"]} !important; }}
-    [data-testid="stFileUploader"] section {{
-        background-color: {t["card_bg"]} !important;
-        border-color: {t["divider"]} !important;
-    }}
-    [data-testid="stButton"] button {{
-        background: {t["card_bg"]} !important;
-        color: {t["text"]} !important;
-        border: 1px solid {t["divider"]} !important;
-    }}
-    [data-testid="stButton"] button:hover {{
-        border-color: {t["primary"]} !important;
-        color: {t["primary"]} !important;
-    }}
-    [data-testid="stDateInput"] input {{
-        background: #fff !important;
-        color: {t["text"]} !important;
-    }}
-    [data-testid="stSidebar"] p,
-    [data-testid="stSidebar"] span,
-    [data-testid="stSidebar"] label,
-    [data-testid="stSidebar"] li {{ color: {t["text"]} !important; }}
-    </style>
-    """, unsafe_allow_html=True)
-
 
 _inject_css(st.session_state.theme)
 
@@ -156,47 +42,6 @@ CHART_LAYOUT = dict(
     hovermode     = "x unified",
     margin        = dict(t=16, b=4, l=4, r=4),
 )
-
-# ── Color palette ──────────────────────────────────────────────────────────
-C = {
-    "deep_sleep":      "#1565C0",
-    "light_sleep":     "#90CAF9",
-    "rem_sleep":       "#7B1FA2",
-    "awake_time":      "#EF9A9A",
-    "sleep_score":     "#26C6DA",
-    "hrv":             "#66BB6A",
-    "resting_hr":      "#EF5350",
-    "breathing_rate":  "#AB47BC",
-    "steps":           "#FFA726",
-    "calories":        "#EC407A",
-    "active_minutes":  "#26A69A",
-    "distance":        "#78909C",
-    "heart_rate":      "#FF7043",
-    "stress_avg":      "#FF8A65",
-    "stress_high":     "#D84315",
-    "stress_low":      "#FFCC80",
-    "readiness_score": "#5C6BC0",
-    "anomaly":         "#E53935",
-}
-
-
-# ── Helpers ────────────────────────────────────────────────────────────────
-def filter_by_date(df: pd.DataFrame, start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
-    if "date" not in df.columns or df.empty:
-        return df
-    return df[df["date"].between(start, end)].reset_index(drop=True)
-
-
-def global_date_bounds() -> tuple[pd.Timestamp, pd.Timestamp]:
-    all_dates: list[pd.Timestamp] = []
-    for df in st.session_state.data.values():
-        if "date" in df.columns:
-            all_dates.extend(df["date"].dropna().tolist())
-    if not all_dates:
-        today = pd.Timestamp.now().normalize()
-        return today - pd.Timedelta(days=30), today
-    return min(all_dates), max(all_dates)
-
 
 # ── Sidebar ────────────────────────────────────────────────────────────────
 with st.sidebar:
@@ -274,7 +119,7 @@ with st.sidebar:
 
         # ── Date range ─────────────────────────────────────────────────────
         st.subheader("Date range")
-        lo, hi = global_date_bounds()
+        lo, hi = global_date_bounds(st.session_state.data)
         d1 = st.date_input("From", value=lo.date(), min_value=lo.date(), max_value=hi.date())
         d2 = st.date_input("To",   value=hi.date(), min_value=lo.date(), max_value=hi.date())
         START = pd.Timestamp(d1)

@@ -27,7 +27,7 @@ def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict) -> None:
                     color_discrete_sequence=[C["hrv"]],
                     hover_data={"date": "|%Y-%m-%d"},
                 )
-            except Exception:
+            except ImportError:
                 fig = px.scatter(
                     corr_df, x="hrv", y="readiness_score",
                     labels={"hrv": "Overnight HRV", "readiness_score": "Next-Day Readiness"},

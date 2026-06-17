@@ -24,13 +24,15 @@ def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict) -> None:
     if "stress_high" in stress.columns and "stress_low" in stress.columns:
         band = stress.dropna(subset=["stress_high", "stress_low"])
         fig.add_trace(go.Scatter(
-            x=band["date"].tolist() + band["date"].tolist()[::-1],
-            y=band["stress_high"].tolist() + band["stress_low"].tolist()[::-1],
-            fill="toself",
-            fillcolor="rgba(255,138,101,0.18)",
-            line=dict(color="rgba(0,0,0,0)"),
-            name="Daily range",
-            hoverinfo="skip",
+            x=band["date"], y=band["stress_low"],
+            mode="lines", line=dict(color="rgba(0,0,0,0)"),
+            showlegend=False, hoverinfo="skip",
+        ))
+        fig.add_trace(go.Scatter(
+            x=band["date"], y=band["stress_high"],
+            mode="lines", line=dict(color="rgba(0,0,0,0)"),
+            fill="tonexty", fillcolor="rgba(255,138,101,0.18)",
+            name="Daily range", hoverinfo="skip",
         ))
 
     fig.add_trace(go.Scatter(

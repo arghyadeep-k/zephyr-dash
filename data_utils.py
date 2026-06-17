@@ -229,12 +229,30 @@ def get_correlation_matrix(data: dict[str, pd.DataFrame]) -> pd.DataFrame:
         for col in df.columns:
             if col == "date":
                 continue
-            if df[col].dtype in (float, int, np.float64, np.int64, np.float32, np.int32):
+            if pd.api.types.is_numeric_dtype(df[col]):
                 label = FRIENDLY_NAMES.get(col, col)
                 series_map[label] = df.set_index("date")[col]
     if len(series_map) < 3:
         return pd.DataFrame()
     return pd.DataFrame(series_map).corr()
+
+
+def filter_by_date(df: pd.DataFrame, start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
+    if "date" not in df.columns or df.empty:
+        return df
+    return df[df["date"].between(start, end)].reset_index(drop=True)
+
+
+@st.cache_data
+def global_date_bounds(data: dict) -> tuple[pd.Timestamp, pd.Timestamp]:
+    all_dates: list[pd.Timestamp] = []
+    for df in data.values():
+        if "date" in df.columns:
+            all_dates.extend(df["date"].dropna().tolist())
+    if not all_dates:
+        today = pd.Timestamp.now().normalize()
+        return today - pd.Timedelta(days=30), today
+    return min(all_dates), max(all_dates)
 
 
 def make_sample_data() -> dict[str, pd.DataFrame]:
