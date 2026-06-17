@@ -1,4 +1,6 @@
 """Theme configuration and CSS injection for the Zepp Health Dashboard."""
+from typing import TypedDict
+
 import streamlit as st
 
 THEMES: dict[str, dict] = {
@@ -54,6 +56,13 @@ C = {
     "readiness_score": "#5C6BC0",
     "anomaly":         "#E53935",
 }
+
+
+class RenderCtx(TypedDict):
+    C: dict
+    T: dict
+    CHART_LAYOUT: dict
+    AVG_LINE: str
 
 
 def _inject_css(theme: str) -> None:

@@ -6,10 +6,14 @@ import pandas as pd
 
 from data_utils import add_hrv_anomalies, rolling_line
 from tabs.helpers import apply_axis_style
+from theme import RenderCtx
 
 
-def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict, AVG_LINE: str,
-           hrv_threshold: float = 0.20) -> None:
+def render(data: dict, ctx: RenderCtx, hrv_threshold: float = 0.20) -> None:
+    C            = ctx["C"]
+    T            = ctx["T"]
+    CHART_LAYOUT = ctx["CHART_LAYOUT"]
+    AVG_LINE     = ctx["AVG_LINE"]
     st.subheader("Sleep Analysis")
 
     if "sleep" not in data or data["sleep"].empty:

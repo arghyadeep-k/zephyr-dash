@@ -5,12 +5,17 @@ import plotly.express as px
 
 from data_utils import rolling_line
 from tabs.helpers import apply_axis_style
+from theme import RenderCtx
 
 STEP_GOAL           = 10_000
 ACTIVE_MINUTES_GOAL = 30
 
 
-def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict, AVG_LINE: str) -> None:
+def render(data: dict, ctx: RenderCtx) -> None:
+    C            = ctx["C"]
+    T            = ctx["T"]
+    CHART_LAYOUT = ctx["CHART_LAYOUT"]
+    AVG_LINE     = ctx["AVG_LINE"]
     st.subheader("Activity")
 
     if "activity" not in data or data["activity"].empty:

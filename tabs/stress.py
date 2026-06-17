@@ -2,9 +2,13 @@
 import streamlit as st
 import plotly.graph_objects as go
 from tabs.helpers import apply_axis_style
+from theme import RenderCtx
 
 
-def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict) -> None:
+def render(data: dict, ctx: RenderCtx) -> None:
+    C            = ctx["C"]
+    T            = ctx["T"]
+    CHART_LAYOUT = ctx["CHART_LAYOUT"]
     st.subheader("Stress")
 
     if "stress" not in data or data["stress"].empty:

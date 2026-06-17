@@ -2,7 +2,7 @@
 import streamlit as st
 import pandas as pd
 
-from theme import THEMES, C, _inject_css
+from theme import THEMES, C, _inject_css, RenderCtx
 
 import tabs.overview
 import tabs.sleep
@@ -42,6 +42,7 @@ CHART_LAYOUT = dict(
     hovermode     = "x unified",
     margin        = dict(t=16, b=4, l=4, r=4),
 )
+ctx: RenderCtx = {"C": C, "T": T, "CHART_LAYOUT": CHART_LAYOUT, "AVG_LINE": AVG_LINE}
 
 # ── Sidebar ────────────────────────────────────────────────────────────────
 with st.sidebar:
@@ -162,25 +163,25 @@ tab_overview, tab_sleep, tab_activity, tab_hr, tab_stress, tab_readiness, tab_co
 ])
 
 with tab_overview:
-    tabs.overview.render(data, C, T, CHART_LAYOUT)
+    tabs.overview.render(data, ctx)
 
 with tab_sleep:
-    tabs.sleep.render(data, C, T, CHART_LAYOUT, AVG_LINE, hrv_threshold=hrv_threshold)
+    tabs.sleep.render(data, ctx, hrv_threshold=hrv_threshold)
 
 with tab_activity:
-    tabs.activity.render(data, C, T, CHART_LAYOUT, AVG_LINE)
+    tabs.activity.render(data, ctx)
 
 with tab_hr:
-    tabs.heart_rate.render(data, C, T, CHART_LAYOUT)
+    tabs.heart_rate.render(data, ctx)
 
 with tab_stress:
-    tabs.stress.render(data, C, T, CHART_LAYOUT)
+    tabs.stress.render(data, ctx)
 
 with tab_readiness:
-    tabs.readiness.render(data, C, T, CHART_LAYOUT, AVG_LINE)
+    tabs.readiness.render(data, ctx)
 
 with tab_corr:
-    tabs.correlations.render(data, C, T, CHART_LAYOUT)
+    tabs.correlations.render(data, ctx)
 
 with tab_weekly:
-    tabs.weekly_summary.render(st.session_state.data, C, T, CHART_LAYOUT)
+    tabs.weekly_summary.render(st.session_state.data, ctx)

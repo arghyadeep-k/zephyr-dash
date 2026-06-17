@@ -4,9 +4,14 @@ import plotly.graph_objects as go
 
 from data_utils import rolling_line
 from tabs.helpers import apply_axis_style
+from theme import RenderCtx
 
 
-def render(data: dict, C: dict, T: dict, CHART_LAYOUT: dict, AVG_LINE: str) -> None:
+def render(data: dict, ctx: RenderCtx) -> None:
+    C            = ctx["C"]
+    T            = ctx["T"]
+    CHART_LAYOUT = ctx["CHART_LAYOUT"]
+    AVG_LINE     = ctx["AVG_LINE"]
     st.subheader("Readiness / BioCharge")
 
     if "readiness" not in data or data["readiness"].empty:

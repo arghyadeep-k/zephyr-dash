@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 
 from data_utils import get_weekly_summary
 from tabs.helpers import apply_axis_style
+from theme import RenderCtx
 
 _HIGHER_BETTER = {
     "Sleep Score", "HRV", "Deep Sleep (min)", "REM Sleep (min)",
@@ -11,7 +12,10 @@ _HIGHER_BETTER = {
 }
 
 
-def render(full_data: dict, C: dict, T: dict, CHART_LAYOUT: dict) -> None:
+def render(full_data: dict, ctx: RenderCtx) -> None:
+    C            = ctx["C"]
+    T            = ctx["T"]
+    CHART_LAYOUT = ctx["CHART_LAYOUT"]
     st.subheader("Weekly Summary: This Week vs Last Week")
     st.caption("Uses full dataset, not filtered by date range above.")
 
