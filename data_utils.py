@@ -116,6 +116,22 @@ def normalize_df(df: pd.DataFrame, col_map: dict[str, str]) -> pd.DataFrame:
     return df
 
 
+def aggregate_to_daily(df: pd.DataFrame, dtype: str) -> pd.DataFrame:
+    """Collapse multiple same-day readings into one row per day (currently: heart_rate only)."""
+    if dtype != "heart_rate" or df.empty or "date" not in df.columns:
+        return df
+    if df["date"].duplicated().sum() == 0:
+        return df
+    agg = {}
+    if "heart_rate" in df.columns:
+        agg["heart_rate"] = "mean"
+    if "resting_hr" in df.columns:
+        agg["resting_hr"] = "min"
+    if not agg:
+        return df
+    return df.groupby("date", as_index=False).agg(agg)
+
+
 def detect_type(col_map: dict[str, str]) -> str:
     """Guess the data type (sleep/activity/heart_rate/stress/readiness) from detected columns."""
     detected = set(col_map.keys())
@@ -141,12 +157,14 @@ def read_csv_safe(file_obj) -> pd.DataFrame:
     raise ValueError("Could not parse CSV — check the file format.")
 
 
+@st.cache_data
 def load_file(file_obj) -> tuple[pd.DataFrame, str, dict[str, str]]:
-    """Full pipeline: read → detect columns → normalize → detect type."""
+    """Full pipeline: read → detect columns → detect type → normalize → aggregate."""
     df_raw = read_csv_safe(file_obj)
     col_map = detect_columns(df_raw)
-    df = normalize_df(df_raw, col_map)
     dtype = detect_type(col_map)
+    df = normalize_df(df_raw, col_map)
+    df = aggregate_to_daily(df, dtype)
     return df, dtype, col_map
 
 

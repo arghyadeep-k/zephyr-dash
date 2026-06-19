@@ -28,6 +28,8 @@ if "theme" not in st.session_state:
     st.session_state.theme = "dark"
 if "data" not in st.session_state:
     st.session_state.data: dict[str, pd.DataFrame] = {}
+if "processed_files" not in st.session_state:
+    st.session_state.processed_files: set[tuple[str, int]] = set()
 
 T = THEMES[st.session_state.theme]
 
@@ -73,6 +75,9 @@ with st.sidebar:
     )
     if uploaded:
         for f in uploaded:
+            key = (f.name, f.size)
+            if key in st.session_state.processed_files:
+                continue
             try:
                 df, dtype, col_map = load_file(f)
                 if dtype == "unknown" or df.empty:
@@ -92,6 +97,8 @@ with st.sidebar:
                 st.success(f"**{f.name}** → *{dtype}*\n\n`{', '.join(col_map.keys())}`")
             except Exception as exc:
                 st.error(f"Error reading **{f.name}**: {exc}")
+            finally:
+                st.session_state.processed_files.add(key)
 
     btn_col1, btn_col2 = st.columns(2)
     with btn_col1:
@@ -101,6 +108,7 @@ with st.sidebar:
     with btn_col2:
         if st.button("🗑 Clear", use_container_width=True, disabled=not st.session_state.data):
             st.session_state.data = {}
+            st.session_state.processed_files = set()
             st.rerun()
 
     st.divider()
@@ -114,6 +122,7 @@ with st.sidebar:
             la.markdown(f"**{dtype.replace('_', ' ').title()}** — {len(df)} rows")
             if lb.button("✕", key=f"remove_{dtype}", help=f"Remove {dtype} data"):
                 del st.session_state.data[dtype]
+                st.session_state.processed_files = set()
                 st.rerun()
 
         st.divider()

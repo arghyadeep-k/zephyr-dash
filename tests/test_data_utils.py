@@ -8,7 +8,7 @@ from unittest.mock import patch
 # Patch st.cache_data to identity before any data_utils import
 with patch("streamlit.cache_data", lambda f: f):
     from data_utils import (
-        detect_columns, detect_type, normalize_df,
+        detect_columns, detect_type, normalize_df, aggregate_to_daily, load_file,
         add_hrv_anomalies, get_weekly_summary,
         get_hrv_readiness_corr, get_correlation_matrix,
         rolling_line,
@@ -183,6 +183,86 @@ class TestNormalizeDf:
         col_map = {"date": "Date", "sleep_score": "Sleep Score"}
         result = normalize_df(df_raw, col_map)
         assert "unknown_col" not in result.columns
+
+
+# ---------------------------------------------------------------------------
+# aggregate_to_daily
+# ---------------------------------------------------------------------------
+
+class TestAggregateToDaily:
+    def test_multiple_readings_per_day_collapsed_to_one_row(self):
+        df = pd.DataFrame({
+            "date": pd.to_datetime([
+                "2024-01-15", "2024-01-15", "2024-01-15",
+                "2024-01-16", "2024-01-16",
+            ]),
+            "heart_rate": [70, 80, 90, 60, 64],
+            "resting_hr": [55, 58, 56, 50, 52],
+        })
+        result = aggregate_to_daily(df, "heart_rate")
+        assert len(result) == 2
+
+    def test_heart_rate_aggregated_with_mean(self):
+        df = pd.DataFrame({
+            "date": pd.to_datetime(["2024-01-15"] * 3),
+            "heart_rate": [70, 80, 90],
+        })
+        result = aggregate_to_daily(df, "heart_rate")
+        assert result["heart_rate"].iloc[0] == pytest.approx(80.0)
+
+    def test_resting_hr_aggregated_with_min(self):
+        df = pd.DataFrame({
+            "date": pd.to_datetime(["2024-01-15"] * 3),
+            "resting_hr": [55, 48, 62],
+        })
+        result = aggregate_to_daily(df, "heart_rate")
+        assert result["resting_hr"].iloc[0] == 48
+
+    def test_non_heart_rate_dtype_passed_through_unchanged(self):
+        df = pd.DataFrame({
+            "date": pd.to_datetime(["2024-01-15", "2024-01-15"]),
+            "sleep_score": [80, 85],
+        })
+        result = aggregate_to_daily(df, "sleep")
+        pd.testing.assert_frame_equal(df, result)
+
+    def test_already_daily_data_unchanged(self):
+        df = pd.DataFrame({
+            "date": pd.to_datetime(["2024-01-15", "2024-01-16"]),
+            "heart_rate": [70, 72],
+        })
+        result = aggregate_to_daily(df, "heart_rate")
+        assert len(result) == 2
+        assert result["heart_rate"].tolist() == [70, 72]
+
+    def test_large_multi_month_high_frequency_file_collapses_correctly(self):
+        n_days, per_day = 30, 50
+        dates = pd.to_datetime(
+            [d for d in pd.date_range("2024-01-01", periods=n_days) for _ in range(per_day)]
+        )
+        rng = np.random.default_rng(0)
+        df = pd.DataFrame({
+            "date": dates,
+            "heart_rate": rng.normal(70, 5, n_days * per_day),
+        })
+        result = aggregate_to_daily(df, "heart_rate")
+        assert len(result) == n_days
+
+
+# ---------------------------------------------------------------------------
+# load_file (pipeline ordering)
+# ---------------------------------------------------------------------------
+
+class TestLoadFilePipelineOrder:
+    def test_high_frequency_heart_rate_csv_detected_and_collapsed_to_daily(self):
+        rows = []
+        for day in pd.date_range("2024-01-01", periods=5):
+            for hr in [65, 70, 75, 80, 72]:
+                rows.append(f"{day.date()},{hr}\n")
+        csv = "Date,avg bpm\n" + "".join(rows)
+        df, dtype, col_map = load_file(io.BytesIO(csv.encode()))
+        assert dtype == "heart_rate"
+        assert len(df) == 5  # collapsed from 25 raw readings to 5 days
 
 
 # ---------------------------------------------------------------------------

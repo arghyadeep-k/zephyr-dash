@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 import pandas as pd
 
 from data_utils import FRIENDLY_NAMES
-from tabs.helpers import apply_axis_style
+from tabs.helpers import apply_axis_style, downsample_for_plot
 from theme import RenderCtx
 
 
@@ -22,6 +22,8 @@ def render(data: dict, ctx: RenderCtx) -> None:
     if hr_df.empty:
         st.info("No heart rate data in range.")
         return
+
+    hr_df = downsample_for_plot(hr_df)
 
     plot_cols = [c for c in ["heart_rate", "resting_hr"] if c in hr_df.columns]
     if not plot_cols:
