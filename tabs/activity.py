@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 
 from data_utils import rolling_line
-from tabs.helpers import apply_axis_style
+from tabs.helpers import apply_axis_style, downsample_for_plot
 from theme import RenderCtx
 
 STEP_GOAL           = 10_000
@@ -22,7 +22,7 @@ def render(data: dict, ctx: RenderCtx) -> None:
         st.info("No activity data in range.")
         return
 
-    act = data["activity"]
+    act = downsample_for_plot(data["activity"])
 
     if "steps" in act.columns:
         st.markdown("#### Daily Steps")

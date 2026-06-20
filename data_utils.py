@@ -116,17 +116,22 @@ def normalize_df(df: pd.DataFrame, col_map: dict[str, str]) -> pd.DataFrame:
     return df
 
 
+_DAILY_AGGREGATIONS: dict[str, dict[str, str]] = {
+    "heart_rate": {"heart_rate": "mean", "resting_hr": "min"},
+    "stress":     {"stress_avg": "mean", "stress_high": "max", "stress_low": "min"},
+    "activity":   {"steps": "sum", "calories": "sum", "active_minutes": "sum", "distance": "sum"},
+}
+
+
 def aggregate_to_daily(df: pd.DataFrame, dtype: str) -> pd.DataFrame:
-    """Collapse multiple same-day readings into one row per day (currently: heart_rate only)."""
-    if dtype != "heart_rate" or df.empty or "date" not in df.columns:
+    """Collapse multiple same-day readings into one row per day for high-frequency
+    raw exports (heart_rate, stress, activity can all be per-minute Zepp logs)."""
+    col_aggs = _DAILY_AGGREGATIONS.get(dtype)
+    if not col_aggs or df.empty or "date" not in df.columns:
         return df
     if df["date"].duplicated().sum() == 0:
         return df
-    agg = {}
-    if "heart_rate" in df.columns:
-        agg["heart_rate"] = "mean"
-    if "resting_hr" in df.columns:
-        agg["resting_hr"] = "min"
+    agg = {col: fn for col, fn in col_aggs.items() if col in df.columns}
     if not agg:
         return df
     return df.groupby("date", as_index=False).agg(agg)

@@ -248,6 +248,42 @@ class TestAggregateToDaily:
         result = aggregate_to_daily(df, "heart_rate")
         assert len(result) == n_days
 
+    def test_stress_columns_aggregated_with_mean_max_min(self):
+        df = pd.DataFrame({
+            "date": pd.to_datetime(["2024-01-15"] * 3),
+            "stress_avg":  [40, 50, 60],
+            "stress_high": [70, 90, 80],
+            "stress_low":  [20, 10, 30],
+        })
+        result = aggregate_to_daily(df, "stress")
+        assert len(result) == 1
+        assert result["stress_avg"].iloc[0] == pytest.approx(50.0)
+        assert result["stress_high"].iloc[0] == 90
+        assert result["stress_low"].iloc[0] == 10
+
+    def test_activity_columns_aggregated_with_sum(self):
+        df = pd.DataFrame({
+            "date": pd.to_datetime(["2024-01-15"] * 3),
+            "steps":          [100, 200, 150],
+            "calories":       [5, 10, 8],
+            "active_minutes": [1, 2, 1],
+            "distance":       [0.1, 0.2, 0.15],
+        })
+        result = aggregate_to_daily(df, "activity")
+        assert len(result) == 1
+        assert result["steps"].iloc[0] == 450
+        assert result["calories"].iloc[0] == 23
+        assert result["active_minutes"].iloc[0] == 4
+        assert result["distance"].iloc[0] == pytest.approx(0.45)
+
+    def test_readiness_dtype_has_no_aggregation_entry_and_is_unchanged(self):
+        df = pd.DataFrame({
+            "date": pd.to_datetime(["2024-01-15", "2024-01-15"]),
+            "readiness_score": [70, 75],
+        })
+        result = aggregate_to_daily(df, "readiness")
+        pd.testing.assert_frame_equal(df, result)
+
 
 # ---------------------------------------------------------------------------
 # load_file (pipeline ordering)

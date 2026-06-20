@@ -1,7 +1,7 @@
 """Stress tab — daily stress band and summary stats."""
 import streamlit as st
 import plotly.graph_objects as go
-from tabs.helpers import apply_axis_style
+from tabs.helpers import apply_axis_style, downsample_for_plot
 from theme import RenderCtx
 
 
@@ -15,7 +15,7 @@ def render(data: dict, ctx: RenderCtx) -> None:
         st.info("No stress data in range.")
         return
 
-    stress = data["stress"]
+    stress = downsample_for_plot(data["stress"])
 
     if "stress_avg" not in stress.columns:
         st.info("Stress average column not found in this dataset.")
